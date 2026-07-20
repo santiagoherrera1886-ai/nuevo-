@@ -113,7 +113,7 @@ body{
 
 /* ------- Los dos títeres + micrófono ------- */
 .performers{
-  position:absolute; left:50%; bottom:clamp(58px,12.5vh,128px);
+  position:fixed; left:50%; bottom:clamp(60px,12.8vh,130px);
   transform:translateX(-50%);
   display:flex; align-items:flex-end;
   z-index:14;
@@ -281,9 +281,11 @@ body{
 
 /* ===================== TEXTO ===================== */
 .caption-band{
-  flex:0 0 auto; min-height:21vh;
-  display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:1vh; padding:1.4vh 6vw; position:relative; z-index:20; text-align:center;
+  flex:0 0 auto;
+  margin-top:calc(clamp(30px,6vh,56px) + clamp(38px,7vh,72px));
+  min-height:14vh;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+  gap:1vh; padding:1.8vh 6vw 0; position:relative; z-index:20; text-align:center;
 }
 .caption{
   max-width:26ch;
@@ -437,6 +439,32 @@ body{
 .spark{ position:absolute; color:#ffe0a0; font-size:clamp(10px,2vw,16px); opacity:.1; animation:tw 3.4s ease-in-out infinite; }
 @keyframes tw{ 0%,100%{ opacity:.08; transform:scale(.8);} 50%{ opacity:.85; transform:scale(1.12);} }
 
+/* Botón de voz en off */
+.tts-btn{
+  position:absolute; z-index:44;
+  top:calc(clamp(30px,6vh,56px) + 10px);
+  right:calc(clamp(14px,3vw,30px) + 10px);
+  width:44px; height:44px; border-radius:50%;
+  border:none; cursor:pointer; font-size:20px; line-height:1;
+  background:rgba(40,20,30,.55); color:#ffe3ae;
+  box-shadow:0 2px 10px rgba(0,0,0,.35);
+  -webkit-backdrop-filter:blur(3px); backdrop-filter:blur(3px);
+  touch-action:manipulation;
+}
+.tts-btn.off{ opacity:.55; }
+.tts-btn:focus-visible{ outline:3px solid #fff2d6; outline-offset:2px; }
+
+/* ===================== AJUSTE FINO PARA CELULAR ===================== */
+@media (max-width:540px){
+  .puppet-rig{ width:clamp(104px,31vw,150px); }
+  .mic{ height:clamp(92px,25vmin,150px); margin:0 clamp(-24px,-5vmin,-8px); }
+  .performers{ bottom:clamp(52px,11vh,96px); }
+  .prop{ width:clamp(46px,15vw,72px); margin-left:calc(clamp(46px,15vw,72px) / -2); }
+  .caption{ max-width:30ch; }
+  .floor{ height:clamp(56px,11vh,96px); }
+  .hills{ bottom:clamp(56px,11vh,96px); }
+}
+
 /* ===================== ACCESIBILIDAD ===================== */
 @media (prefers-reduced-motion: reduce){
   .theater *{ animation-duration:.001s !important; animation-iteration-count:1 !important; }
@@ -466,6 +494,12 @@ body{
 
   <!-- Contenido -->
   <div class="content">
+    <!-- Texto (arriba, como narración) -->
+    <div class="caption-band">
+      <p class="caption" id="caption"></p>
+      <p class="signature" id="signature">— Para ti, Adriana ✦</p>
+    </div>
+
     <div class="scene" id="scene">
       <div class="spotlight"></div>
       <div class="warmth"></div>
@@ -477,7 +511,7 @@ body{
         <div class="puppet-rig puppet-a character" id="puppetA">
           <div class="shadow"></div>
           <div class="rig-sway">
-            <svg class="puppet-svg" viewBox="0 0 220 430" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <svg class="puppet-svg" viewBox="0 0 220 388" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <rect class="crossbar" x="34" y="8" width="152" height="12" rx="6"/>
               <rect class="crossbar" x="104" y="2" width="12" height="24" rx="5"/>
               <circle class="crossbar-knob" cx="46" cy="14" r="7"/>
@@ -581,7 +615,7 @@ body{
         <div class="puppet-rig puppet-b character" id="puppetB">
           <div class="shadow"></div>
           <div class="rig-sway">
-            <svg class="puppet-svg" viewBox="0 0 220 430" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <svg class="puppet-svg" viewBox="0 0 220 388" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
               <rect class="crossbar" x="34" y="8" width="152" height="12" rx="6"/>
               <rect class="crossbar" x="104" y="2" width="12" height="24" rx="5"/>
               <circle class="crossbar-knob" cx="46" cy="14" r="7"/>
@@ -692,12 +726,6 @@ body{
       </div>
     </div>
 
-    <!-- Texto -->
-    <div class="caption-band">
-      <p class="caption" id="caption"></p>
-      <p class="signature" id="signature">— Para ti, Adriana ✦</p>
-    </div>
-
     <!-- Controles -->
     <div class="controls">
       <div class="dots" id="dots"></div>
@@ -711,6 +739,7 @@ body{
   <div class="curtain curtain-l"></div>
   <div class="curtain curtain-r"></div>
   <div class="marquee">✦ EL TEATRINO ✦</div>
+  <button class="tts-btn" id="ttsBtn" type="button" aria-label="Activar o silenciar la voz en off">🔊</button>
   <div class="valance">
     <svg viewBox="0 0 120 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -777,6 +806,35 @@ body{
   var canvas    = $('#fx');
   var ctx       = canvas.getContext('2d');
   var reduce    = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ttsBtn    = $('#ttsBtn');
+
+  /* ---- Voz en off: el navegador narra cada escena en español. ----
+     Si agregas tu propio <audio id="voz"> (tu grabación), esta voz
+     se desactiva sola para no pisar tu audio. */
+  var ttsOK = ('speechSynthesis' in window);
+  var ttsOn = true;
+  if(ttsOK){
+    try{ window.speechSynthesis.getVoices(); window.speechSynthesis.onvoiceschanged = function(){}; }catch(e){}
+  }
+  function pickVoiceEs(){
+    try{
+      var vs = window.speechSynthesis.getVoices();
+      for(var i=0;i<vs.length;i++){ if(/^es[-_]?(CO|MX|US|419)/i.test(vs[i].lang)) return vs[i]; }
+      for(var j=0;j<vs.length;j++){ if(/^es/i.test(vs[j].lang)) return vs[j]; }
+    }catch(e){}
+    return null;
+  }
+  function speak(text){
+    if(!ttsOK || !ttsOn || voice()) return;
+    try{
+      window.speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      u.lang = 'es-CO'; u.rate = .95; u.pitch = 1.02;
+      var v = pickVoiceEs(); if(v){ u.voice = v; u.lang = v.lang; }
+      window.speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function ttsStop(){ if(ttsOK){ try{ window.speechSynthesis.cancel(); }catch(e){} } }
 
   // ---- La obra: t = texto, a = ánimo títere A (tú), b = ánimo títere B (ella),
   //      enterB = ella baja al escenario en este paso, prop = utilería visible ----
@@ -861,6 +919,7 @@ body{
     if(s.b && bOnStage){ puppetB.dataset.mood = s.b; }
     setProps(s.prop || null);
     updateDots();
+    speak(s.t);
     if(s.final){
       nextBtn.textContent = 'Repetir función ↺';
       signature.classList.add('show');
@@ -916,6 +975,7 @@ body{
     nextBtn.textContent = 'Siguiente ›';
     controls.classList.remove('ready');
     stopVoice();
+    ttsStop();
     started = false;
     startScr.classList.remove('hidden');
     busy = false;
@@ -928,6 +988,16 @@ body{
   }
 
   nextBtn.addEventListener('click', advance);
+  if(ttsBtn){
+    if(!ttsOK || voice()){ ttsBtn.style.display = 'none'; }
+    ttsBtn.addEventListener('click', function(){
+      ttsOn = !ttsOn;
+      ttsBtn.textContent = ttsOn ? '🔊' : '🔇';
+      ttsBtn.classList.toggle('off', !ttsOn);
+      if(!ttsOn){ ttsStop(); }
+      else if(idx >= 0){ speak(steps[idx].t); }
+    });
+  }
   beginBtn.addEventListener('click', function(e){ e.stopPropagation(); begin(); });
   startScr.addEventListener('click', begin);
   startScr.addEventListener('keydown', function(e){
