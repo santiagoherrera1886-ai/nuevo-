@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Una función especial · para Adriana</title>
+<title>Teatrino de títeres · para Adriana</title>
 
-<!-- Tipografías: Fraunces (serif cálido y nostálgico) + Nunito (redondeada y amable).
-     Si se abre sin internet, cae a Georgia / system-ui sin romperse. -->
+<!-- Tipografías: Fraunces (serif cálido) + Nunito (redondeada).
+     Sin internet cae a Georgia / system-ui sin romperse. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
@@ -16,12 +16,12 @@
   /* Paleta atardecer */
   --sky-1:#241a3a; --sky-2:#3a2350; --sky-3:#6e2f5e; --sky-4:#b8455f;
   --sky-5:#e86a4b; --sky-6:#f6a552; --sky-7:#ffd089;
-  --floor-1:#4a2338; --floor-2:#341829;
-  --curtain-a:#7d2536; --curtain-b:#5a1826; --curtain-c:#6b1f2e;
+  --wood-1:#8a5a33; --wood-2:#6e4526; --wood-3:#59371e;
   --gold:#e9c46a;
   --text:#fff4e6; --text-soft:#ffd6a3;
-  /* Personaje */
-  --ink:#43302b; --skin:#ffe0c7; --coral:#e07a5f; --hair:#4a2f2a;
+  /* Títeres (cada títere puede redefinir sus variables) */
+  --ink:#43302b; --skin:#ffe0c7; --outfit:#e07a5f; --hair:#4a2f2a;
+  --string:rgba(255,240,214,.55);
   --serif:'Fraunces','Georgia','Times New Roman',serif;
   --round:'Nunito',ui-rounded,'Segoe UI',system-ui,-apple-system,sans-serif;
 }
@@ -37,23 +37,17 @@ body{
   user-select:none;
 }
 
-/* ===================== ESCENARIO (raíz) ===================== */
-.theater{
-  position:fixed; inset:0; min-height:100dvh;
-  overflow:hidden;
-  background:var(--sky-1);
-}
+/* ===================== TEATRINO ===================== */
+.theater{ position:fixed; inset:0; min-height:100dvh; overflow:hidden; background:var(--sky-1); }
 
-/* ------- Fondo: cielo, sol, montañas, foco, piso, luciérnagas ------- */
+/* ------- Fondo ------- */
 .backdrop{ position:absolute; inset:0; overflow:hidden; z-index:1; }
-
 .sky{
   position:absolute; inset:0;
   background:linear-gradient(180deg,
     var(--sky-1) 0%, var(--sky-2) 17%, var(--sky-3) 36%,
     var(--sky-4) 56%, var(--sky-5) 73%, var(--sky-6) 88%, var(--sky-7) 100%);
 }
-
 .sun-glow{
   position:absolute; left:50%; bottom:4%;
   width:clamp(260px,62vmin,600px); aspect-ratio:1;
@@ -72,26 +66,26 @@ body{
   0%,100%{ opacity:.78; transform:translateX(-50%) scale(1); }
   50%{ opacity:1; transform:translateX(-50%) scale(1.05); }
 }
-
 .hills{ position:absolute; left:0; bottom:clamp(70px,14vh,140px); width:100%; height:26%; }
 .hills svg{ display:block; width:100%; height:100%; }
 
+/* Tarima de madera */
 .floor{
   position:absolute; left:0; bottom:0; width:100%;
   height:clamp(70px,14vh,140px);
-  background:linear-gradient(180deg,var(--floor-1) 0%, var(--floor-2) 100%);
-  box-shadow:inset 0 2px 0 rgba(255,205,150,.22);
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 2px, rgba(0,0,0,0) 2px 64px),
+    linear-gradient(180deg,var(--wood-2) 0%, var(--wood-3) 100%);
+  box-shadow:inset 0 3px 0 rgba(255,205,150,.28), inset 0 14px 22px rgba(0,0,0,.25);
   z-index:2;
 }
-
 .spotlight{
   position:absolute; top:0; left:50%; transform:translateX(-50%);
-  width:72%; height:100%;
+  width:80%; height:100%;
   background:linear-gradient(180deg, rgba(255,244,214,.20), rgba(255,244,214,0) 70%);
-  clip-path:polygon(42% 0, 58% 0, 82% 100%, 18% 100%);
+  clip-path:polygon(40% 0, 60% 0, 86% 100%, 14% 100%);
   mix-blend-mode:screen; pointer-events:none;
 }
-
 .warmth{
   position:absolute; inset:0; pointer-events:none;
   background:radial-gradient(circle at 50% 60%, rgba(255,204,140,.38), rgba(255,150,90,0) 60%);
@@ -112,96 +106,114 @@ body{
   100%{ transform:translate(var(--dx,10px),-94vh); opacity:0; }
 }
 
-/* ===================== CONTENIDO (columna flex) ===================== */
+/* ===================== CONTENIDO ===================== */
 .content{ position:absolute; inset:0; z-index:10; height:100%; display:flex; flex-direction:column; }
-
 .scene{ flex:1 1 auto; position:relative; min-height:0; }
-
-/* Lienzo de brasas del final */
 .fx{ position:absolute; inset:0; z-index:15; pointer-events:none; }
 
-/* ------- Actores: personaje + micrófono ------- */
+/* ------- Los dos títeres + micrófono ------- */
 .performers{
   position:absolute; left:50%; bottom:clamp(58px,12.5vh,128px);
   transform:translateX(-50%);
   display:flex; align-items:flex-end;
   z-index:14;
 }
-
 .mic{
-  height:clamp(160px,42vmin,320px); width:auto;
-  margin-left:clamp(-46px,-9vmin,-18px);
-  transform:translateY(-3%);
+  height:clamp(120px,30vmin,220px); width:auto;
+  margin:0 clamp(-30px,-6vmin,-10px);
+  transform:translateY(-2%);
+  flex:0 0 auto;
 }
 .mic svg{ display:block; height:100%; width:auto; }
 
-.stage-character{
+/* Aparejo de cada marioneta (cruceta + hilos + muñeco) */
+.puppet-rig{
   position:relative;
-  width:clamp(150px,40vmin,300px);
-  transform:translateX(-58vw);
-  transition:transform 2.25s cubic-bezier(.33,0,.2,1);
+  width:clamp(128px,35vmin,258px);
+  transform:translateY(-125vh);
+  transition:transform 2.4s cubic-bezier(.3,1.18,.35,1);
+  will-change:transform;
+  flex:0 0 auto;
+}
+.puppet-rig.entered{ transform:translateY(0); }
+.puppet-rig.no-anim{ transition:none !important; }
+
+/* Adriana: sus colores (vestido y pelo) — el mismo esqueleto CSS aplica */
+.puppet-b{ --outfit:#5f9c8f; --hair:#2e211d; }
+
+/* Balanceo colgado de la cruceta; el títere B va a contratiempo */
+.rig-sway{
+  transform-origin:50% 0%;
+  animation:sway 4.6s ease-in-out infinite;
   will-change:transform;
 }
-.stage-character.entered{ transform:translateX(0); }
-.stage-character.no-anim{ transition:none !important; }
+.puppet-b .rig-sway{ animation-delay:-2.3s; }
+@keyframes sway{
+  0%,100%{ transform:rotate(1.4deg); }
+  50%{ transform:rotate(-1.4deg); }
+}
+.puppet-rig.landing .rig-sway{ animation:swayBig 1.1s ease-in-out 2, sway 4.6s ease-in-out 2.2s infinite; }
+@keyframes swayBig{
+  0%,100%{ transform:rotate(3.4deg); }
+  50%{ transform:rotate(-3.4deg); }
+}
 
 .shadow{
-  position:absolute; left:50%; bottom:-2%;
-  width:78%; height:8%;
+  position:absolute; left:50%; bottom:-1.5%;
+  width:70%; height:6%;
   transform:translateX(-50%);
   background:radial-gradient(ellipse at center, rgba(30,10,20,.42), rgba(30,10,20,0) 70%);
   border-radius:50%;
 }
+.puppet-svg{ display:block; width:100%; height:auto; overflow:visible; }
 
-.char-bob{ will-change:transform; }
-.char-svg{ display:block; width:100%; height:auto; overflow:visible; }
-@keyframes bob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-5px); } }
-.stage-character.walking .char-bob{ animation:bob .5s ease-in-out infinite; }
-
-/* ---- Piezas del personaje (líneas y rellenos) ---- */
+/* ---- Piezas compartidas ---- */
+.crossbar{ fill:var(--wood-1); stroke:var(--wood-3); stroke-width:3; }
+.crossbar-knob{ fill:var(--wood-2); stroke:var(--wood-3); stroke-width:2.5; }
+.string{ stroke:var(--string); stroke-width:2; fill:none; }
 .head,.neck{ fill:var(--skin); stroke:var(--ink); stroke-width:6; }
 .hair{ fill:var(--hair); }
-.shirt{ fill:var(--coral); stroke:var(--ink); stroke-width:6; stroke-linejoin:round; }
-.limb-ink{ stroke:var(--ink); stroke-width:17; stroke-linecap:round; fill:none; }
-.limb-skin{ stroke:var(--skin); stroke-width:11; stroke-linecap:round; fill:none; }
+.outfit{ fill:var(--outfit); stroke:var(--ink); stroke-width:6; stroke-linejoin:round; }
+.seam{ stroke:rgba(67,48,43,.5); stroke-width:3; stroke-dasharray:2 7; stroke-linecap:round; fill:none; }
+.limb-ink{ stroke:var(--ink); stroke-width:16; stroke-linecap:round; fill:none; }
+.limb-skin{ stroke:var(--skin); stroke-width:10; stroke-linecap:round; fill:none; }
+.joint{ fill:var(--wood-1); stroke:var(--ink); stroke-width:3.5; }
+.shoe{ fill:var(--wood-2); stroke:var(--ink); stroke-width:4; }
+.specs circle{ fill:none; stroke:var(--ink); stroke-width:4; }
+.specs line{ stroke:var(--ink); stroke-width:4; stroke-linecap:round; }
 .brows path{ stroke:var(--ink); stroke-width:4.5; stroke-linecap:round; fill:none; }
 .eyes circle{ fill:var(--ink); }
 .eyes path{ stroke:var(--ink); stroke-width:5; stroke-linecap:round; fill:none; }
+.blush{ fill:rgba(224,122,95,.4); }
 .mouth{ stroke:var(--ink); stroke-width:6; stroke-linecap:round; fill:none; }
 .m-grin{ fill:var(--ink); stroke:none; }
 .sweat{ fill:#bfe6ff; stroke:#7fb8e0; stroke-width:1.5; }
 .fly-heart{ fill:#ff5d73; }
 
-/* Estados de cara: todo oculto y se revela por ánimo (crossfade) */
 .eyes,.mouth,.sweat,.fly-heart{ opacity:0; transition:opacity .3s ease; }
 
-/* Ejes de rotación (coordenadas del viewBox) */
-.brows{ transform-box:view-box; transform-origin:100px 76px; transition:transform .3s ease; }
-.arm{ transform-box:view-box; transition:transform .35s ease; }
-.arm-left{ transform-origin:62px 150px; transform:rotate(6deg); }
-.arm-right{ transform-origin:138px 150px; transform:rotate(-6deg); }
+/* Ejes (coordenadas del viewBox 0 0 220 430) */
+.brows{ transform-box:view-box; transform-origin:110px 132px; transition:transform .3s ease; }
+.head-tilt{ transform-box:view-box; transform-origin:110px 200px; transition:transform .4s ease; }
+.arm{ transform-box:view-box; transition:transform .4s ease; }
+.arm-left{ transform-origin:76px 218px; animation:dangleA 4.6s ease-in-out infinite; }
+.arm-right{ transform-origin:144px 218px; animation:dangleB 4.6s ease-in-out infinite; }
 .leg{ transform-box:view-box; }
-.leg-left{ transform-origin:86px 236px; }
-.leg-right{ transform-origin:114px 236px; }
-.fly-heart{ transform-box:view-box; transform-origin:100px 150px; }
+.leg-left{ transform-origin:96px 300px; animation:dangleB 5.4s ease-in-out infinite; }
+.leg-right{ transform-origin:124px 300px; animation:dangleA 5.4s ease-in-out infinite; }
+.fly-heart{ transform-box:view-box; transform-origin:110px 235px; }
 .sweat{ transform-box:view-box; }
 
-/* Caminar */
-@keyframes stepA{ 0%,100%{ transform:rotate(20deg);} 50%{ transform:rotate(-20deg);} }
-@keyframes stepB{ 0%,100%{ transform:rotate(-20deg);} 50%{ transform:rotate(20deg);} }
-@keyframes armA{ 0%,100%{ transform:rotate(16deg);} 50%{ transform:rotate(-4deg);} }
-@keyframes armB{ 0%,100%{ transform:rotate(-16deg);} 50%{ transform:rotate(4deg);} }
-.stage-character.walking .leg-left{ animation:stepA .5s ease-in-out infinite; }
-.stage-character.walking .leg-right{ animation:stepB .5s ease-in-out infinite; }
-.stage-character.walking .arm-left{ animation:armA .5s ease-in-out infinite; }
-.stage-character.walking .arm-right{ animation:armB .5s ease-in-out infinite; }
+@keyframes dangleA{ 0%,100%{ transform:rotate(4.5deg);} 50%{ transform:rotate(-4.5deg);} }
+@keyframes dangleB{ 0%,100%{ transform:rotate(-4.5deg);} 50%{ transform:rotate(4.5deg);} }
 
-/* Ánimos por paso */
+/* ---- Ánimos (aplican al títere que tenga ese data-mood) ---- */
 .character[data-mood="curious"] .eyes-open,
 .character[data-mood="warm"] .eyes-open,
 .character[data-mood="sincere"] .eyes-open,
 .character[data-mood="sheepish"] .eyes-open{ opacity:1; }
 .character[data-mood="celebrate"] .eyes-happy,
+.character[data-mood="laugh"] .eyes-happy,
 .character[data-mood="grateful"] .eyes-happy,
 .character[data-mood="heart"] .eyes-happy,
 .character[data-mood="joy"] .eyes-happy{ opacity:1; }
@@ -212,41 +224,72 @@ body{
 .character[data-mood="sincere"] .m-smile{ opacity:1; }
 .character[data-mood="playful"] .m-smirk{ opacity:1; }
 .character[data-mood="celebrate"] .m-grin,
+.character[data-mood="laugh"] .m-grin,
 .character[data-mood="joy"] .m-grin{ opacity:1; }
 .character[data-mood="grateful"] .m-soft,
 .character[data-mood="heart"] .m-soft{ opacity:1; }
 .character[data-mood="sheepish"] .m-squig{ opacity:1; }
 
+/* Cabecita ladeada */
+.character[data-mood="curious"] .head-tilt{ transform:rotate(-4deg); }
 .character[data-mood="curious"] .brows{ transform:translateY(-3px); }
+.character[data-mood="playful"] .head-tilt{ transform:rotate(4deg); }
+.character[data-mood="laugh"] .head-tilt{ transform:rotate(5deg); }
+.character[data-mood="grateful"] .head-tilt{ transform:rotate(-3deg); }
+.character[data-mood="sheepish"] .head-tilt{ transform:rotate(5deg) translateY(3px); }
+.character[data-mood="heart"] .head-tilt{ transform:rotate(-3deg); }
 
-/* Gotita de pena (paso 4) */
+/* Gotita de pena */
 @keyframes drip{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(3px);} }
 .character[data-mood="sheepish"] .sweat{ opacity:1; animation:drip 1.3s ease-in-out infinite; }
 
-/* Mano al corazón (paso 8) + corazón que sube */
-.character[data-mood="heart"] .arm-left{ transform:rotate(52deg); }
+/* Mano al corazón (el hilo del brazo acompaña porque va en el mismo grupo) */
+.character[data-mood="heart"] .arm-left{ animation:none; transform:rotate(58deg); }
 @keyframes heartFloat{
   0%{ opacity:0; transform:translate(0,0) scale(.6);}
   22%{ opacity:1;}
-  100%{ opacity:0; transform:translate(4px,-70px) scale(1.12);}
+  100%{ opacity:0; transform:translate(4px,-72px) scale(1.12);}
 }
 .character[data-mood="heart"] .fly-heart{ animation:heartFloat 1.8s ease-out forwards; }
 
-/* Saludo final (paso 9) */
-@keyframes wave{ 0%,100%{ transform:rotate(-150deg);} 50%{ transform:rotate(-172deg);} }
+/* Festejo: los dos brazos arriba */
+.character[data-mood="celebrate"] .arm-left{ animation:none; transform:rotate(148deg); }
+.character[data-mood="celebrate"] .arm-right{ animation:none; transform:rotate(-148deg); }
+
+/* Risa: manitas a la barriga */
+.character[data-mood="laugh"] .arm-left{ animation:none; transform:rotate(34deg); }
+.character[data-mood="laugh"] .arm-right{ animation:none; transform:rotate(-34deg); }
+
+/* Saludo final + brinquitos de la cruceta */
+@keyframes wave{ 0%,100%{ transform:rotate(-146deg);} 50%{ transform:rotate(-170deg);} }
 .character[data-mood="joy"] .arm-right{ animation:wave .7s ease-in-out infinite; }
+@keyframes hop{ 0%,100%{ transform:translateY(0);} 50%{ transform:translateY(-7px);} }
+.character[data-mood="joy"] .rig-sway{ animation:sway 4.6s ease-in-out infinite, hop 1.4s ease-in-out infinite; }
+.puppet-b[data-mood="joy"] .rig-sway{ animation-delay:-2.3s, -.7s; }
+
+/* ---- Utilería (pastel y regalo) ---- */
+.prop{
+  position:absolute; left:50%; bottom:0; z-index:16;
+  width:clamp(58px,13vmin,104px);
+  margin-left:calc(clamp(58px,13vmin,104px) / -2);
+  opacity:0; transform:translateY(14px) scale(.7);
+  transition:opacity .4s ease, transform .45s cubic-bezier(.34,1.5,.5,1);
+  pointer-events:none; will-change:transform,opacity;
+}
+.prop.show{ opacity:1; transform:translateY(0) scale(1); }
+.prop svg{ display:block; width:100%; height:auto; }
 
 /* ===================== TEXTO ===================== */
 .caption-band{
-  flex:0 0 auto; min-height:22vh;
+  flex:0 0 auto; min-height:21vh;
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   gap:1vh; padding:1.4vh 6vw; position:relative; z-index:20; text-align:center;
 }
 .caption{
-  max-width:22ch;
+  max-width:26ch;
   font-family:var(--serif);
   font-weight:500; line-height:1.34;
-  font-size:clamp(1.2rem,4.7vw,2.1rem);
+  font-size:clamp(1.12rem,4.4vw,2rem);
   color:var(--text);
   text-shadow:0 2px 14px rgba(40,10,20,.55);
   text-wrap:balance;
@@ -275,21 +318,19 @@ body{
 /* ===================== CONTROLES ===================== */
 .controls{
   flex:0 0 auto;
-  display:flex; flex-direction:column; align-items:center; gap:1.5vh;
+  display:flex; flex-direction:column; align-items:center; gap:1.4vh;
   padding:0 6vw calc(2.4vh + env(safe-area-inset-bottom,0px));
   z-index:20;
   opacity:0; transition:opacity .5s ease;
 }
 .controls.ready{ opacity:1; }
-
-.dots{ display:flex; gap:8px; }
+.dots{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; max-width:80vw; }
 .dot{
-  width:9px; height:9px; border-radius:50%;
+  width:8px; height:8px; border-radius:50%;
   background:rgba(255,220,180,.28);
   transition:background .3s ease, transform .3s ease;
 }
 .dot.on{ background:#ffcf8a; transform:scale(1.18); }
-
 .next{
   appearance:none; border:none; cursor:pointer; font-family:var(--round);
   font-weight:800; letter-spacing:.02em; color:#4a261b;
@@ -303,7 +344,16 @@ body{
 .next:active{ transform:scale(.95); }
 .next:focus-visible{ outline:3px solid #fff2d6; outline-offset:3px; }
 
-/* ===================== CORTINAS + CENEFA ===================== */
+/* ===================== MARCO + CORTINAS ===================== */
+.frame-side{
+  position:absolute; top:0; bottom:0; width:clamp(14px,3vw,30px); z-index:42;
+  background:
+    linear-gradient(90deg, rgba(255,220,170,.18), rgba(0,0,0,.25)),
+    linear-gradient(180deg, var(--wood-1), var(--wood-2) 55%, var(--wood-3));
+  box-shadow:0 0 18px rgba(0,0,0,.45);
+}
+.frame-l{ left:0; } .frame-r{ right:0; }
+
 .curtain{
   position:absolute; top:0; bottom:0; width:56%; z-index:40;
   transition:transform 1.15s cubic-bezier(.7,0,.15,1);
@@ -319,10 +369,25 @@ body{
   background:repeating-linear-gradient(90deg,#5a1826 0px,#7d2536 22px,#6b1f2e 44px);
   box-shadow:inset 22px 0 44px rgba(0,0,0,.42);
 }
-.theater.open .curtain-l{ transform:translateX(-84%); }
-.theater.open .curtain-r{ transform:translateX(84%); }
+.theater.open .curtain-l{ transform:translateX(-88%); }
+.theater.open .curtain-r{ transform:translateX(88%); }
 
-.valance{ position:absolute; top:0; left:0; width:100%; height:clamp(46px,9vh,92px); z-index:41; }
+.marquee{
+  position:absolute; top:0; left:0; width:100%; z-index:43;
+  height:clamp(30px,6vh,56px);
+  display:flex; align-items:center; justify-content:center;
+  background:
+    linear-gradient(180deg, rgba(255,224,178,.22), rgba(0,0,0,.22)),
+    linear-gradient(180deg, var(--wood-1), var(--wood-2) 60%, var(--wood-3));
+  box-shadow:0 4px 14px rgba(0,0,0,.4);
+  font-family:var(--serif); font-style:italic; font-weight:600;
+  font-size:clamp(.8rem,2.6vw,1.15rem); letter-spacing:.14em;
+  color:#ffe3ae; text-shadow:0 1px 0 rgba(0,0,0,.5);
+}
+.valance{
+  position:absolute; top:clamp(30px,6vh,56px); left:0; width:100%;
+  height:clamp(38px,7vh,72px); z-index:41;
+}
 .valance svg{ display:block; width:100%; height:100%; }
 
 /* ===================== PANTALLA DE INICIO ===================== */
@@ -369,14 +434,13 @@ body{
 }
 .begin-btn:active{ transform:scale(.95); }
 .begin-btn:focus-visible{ outline:3px solid #fff2d6; outline-offset:3px; }
-
 .spark{ position:absolute; color:#ffe0a0; font-size:clamp(10px,2vw,16px); opacity:.1; animation:tw 3.4s ease-in-out infinite; }
 @keyframes tw{ 0%,100%{ opacity:.08; transform:scale(.8);} 50%{ opacity:.85; transform:scale(1.12);} }
 
-/* ===================== ACCESIBILIDAD: menos movimiento ===================== */
+/* ===================== ACCESIBILIDAD ===================== */
 @media (prefers-reduced-motion: reduce){
   .theater *{ animation-duration:.001s !important; animation-iteration-count:1 !important; }
-  .stage-character{ transition-duration:.001s !important; }
+  .puppet-rig{ transition-duration:.001s !important; }
   .caption{ transition-duration:.18s !important; }
   .curtain{ transition-duration:.4s !important; }
 }
@@ -398,10 +462,9 @@ body{
       </svg>
     </div>
     <div class="floor"></div>
-    <!-- Las luciérnagas (.mote) se inyectan por JS aquí -->
   </div>
 
-  <!-- Contenido en columna -->
+  <!-- Contenido -->
   <div class="content">
     <div class="scene" id="scene">
       <div class="spotlight"></div>
@@ -409,73 +472,94 @@ body{
       <canvas class="fx" id="fx"></canvas>
 
       <div class="performers">
-        <!-- Personaje -->
-        <div class="stage-character character" id="character">
+
+        <!-- TÍTERE A: el narrador (tú), con gafitas -->
+        <div class="puppet-rig puppet-a character" id="puppetA">
           <div class="shadow"></div>
-          <div class="char-bob">
-            <svg class="char-svg" viewBox="0 0 200 314" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-              <!-- Piernas -->
+          <div class="rig-sway">
+            <svg class="puppet-svg" viewBox="0 0 220 430" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect class="crossbar" x="34" y="8" width="152" height="12" rx="6"/>
+              <rect class="crossbar" x="104" y="2" width="12" height="24" rx="5"/>
+              <circle class="crossbar-knob" cx="46" cy="14" r="7"/>
+              <circle class="crossbar-knob" cx="174" cy="14" r="7"/>
+              <line class="string" x1="110" y1="20" x2="110" y2="118"/>
+              <line class="string" x1="52"  y1="20" x2="78"  y2="214"/>
+              <line class="string" x1="168" y1="20" x2="142" y2="214"/>
+
               <g class="leg leg-left">
-                <line class="limb-ink"  x1="86" y1="238" x2="84" y2="302"/>
-                <line class="limb-skin" x1="86" y1="238" x2="84" y2="302"/>
+                <line class="limb-ink"  x1="96" y1="302" x2="94" y2="376"/>
+                <line class="limb-skin" x1="96" y1="302" x2="94" y2="376"/>
+                <circle class="joint" cx="95" cy="340" r="7"/>
+                <rect class="shoe" x="80" y="372" width="30" height="14" rx="7"/>
               </g>
               <g class="leg leg-right">
-                <line class="limb-ink"  x1="114" y1="238" x2="116" y2="302"/>
-                <line class="limb-skin" x1="114" y1="238" x2="116" y2="302"/>
+                <line class="limb-ink"  x1="124" y1="302" x2="126" y2="376"/>
+                <line class="limb-skin" x1="124" y1="302" x2="126" y2="376"/>
+                <circle class="joint" cx="125" cy="340" r="7"/>
+                <rect class="shoe" x="110" y="372" width="30" height="14" rx="7"/>
               </g>
-              <!-- Cuello -->
-              <path class="neck" d="M89,126 h22 v20 h-22 Z"/>
-              <!-- Torso -->
-              <path class="shirt" d="M62,150 Q100,140 138,150 L130,236 Q100,246 70,236 Z"/>
-              <!-- Cabeza -->
-              <circle class="head" cx="100" cy="88" r="46"/>
-              <!-- Pelo con flequillo -->
-              <path class="hair" d="M54,88 A46,46 0 0 1 146,88
-                C146,80 138,76 128,80 C124,72 112,74 108,80
-                C104,72 96,72 92,80 C88,74 76,72 72,80
-                C62,76 54,80 54,88 Z"/>
-              <!-- Brazos (encima del torso para que la mano se vea) -->
+
+              <path class="neck" d="M99,192 h22 v18 h-22 Z"/>
+              <path class="outfit" d="M72,214 Q110,204 148,214 L140,300 Q110,310 80,300 Z"/>
+              <path class="seam" d="M110,214 L110,300"/>
+
+              <g class="head-tilt">
+                <circle class="head" cx="110" cy="152" r="44"/>
+                <path class="hair" d="M66,152 A44,44 0 0 1 154,152
+                  C154,144 146,140 137,144 C133,136 121,138 117,144
+                  C113,136 107,136 103,144 C99,138 87,136 83,144
+                  C74,140 66,144 66,152 Z"/>
+                <g class="brows">
+                  <path d="M87,140 Q95,136 103,140"/>
+                  <path d="M117,140 Q125,136 133,140"/>
+                </g>
+                <circle class="blush" cx="80" cy="166" r="7"/>
+                <circle class="blush" cx="140" cy="166" r="7"/>
+                <g class="eyes eyes-open">
+                  <circle cx="95" cy="154" r="6"/>
+                  <circle cx="125" cy="154" r="6"/>
+                </g>
+                <g class="eyes eyes-happy">
+                  <path d="M89,155 Q95,148 101,155"/>
+                  <path d="M119,155 Q125,148 131,155"/>
+                </g>
+                <g class="eyes eyes-wink">
+                  <circle cx="95" cy="154" r="6"/>
+                  <path d="M119,155 Q125,148 131,155"/>
+                </g>
+                <!-- Gafitas -->
+                <g class="specs">
+                  <circle cx="95" cy="154" r="12"/>
+                  <circle cx="125" cy="154" r="12"/>
+                  <line x1="107" y1="152" x2="113" y2="152"/>
+                </g>
+                <path class="mouth m-smile"  d="M95,174 Q110,188 125,174"/>
+                <path class="mouth m-grin"   d="M93,172 Q110,180 127,172 Q110,200 93,172 Z"/>
+                <path class="mouth m-soft"   d="M100,177 Q110,184 120,177"/>
+                <path class="mouth m-squig"  d="M96,178 Q102,172 108,178 Q114,184 120,178"/>
+                <path class="mouth m-smirk"  d="M96,177 Q110,185 126,170"/>
+                <path class="sweat" d="M157,126 c5,8 5,12 0,16 c-5,-4 -5,-8 0,-16 Z"/>
+              </g>
+
               <g class="arm arm-left">
-                <line class="limb-ink"  x1="62" y1="152" x2="54" y2="208"/>
-                <line class="limb-skin" x1="62" y1="152" x2="54" y2="208"/>
+                <line class="string" x1="76" y1="218" x2="64" y2="278"/>
+                <line class="limb-ink"  x1="76" y1="218" x2="64" y2="278"/>
+                <line class="limb-skin" x1="76" y1="218" x2="64" y2="278"/>
+                <circle class="joint" cx="70" cy="248" r="6.5"/>
               </g>
               <g class="arm arm-right">
-                <line class="limb-ink"  x1="138" y1="152" x2="146" y2="208"/>
-                <line class="limb-skin" x1="138" y1="152" x2="146" y2="208"/>
+                <line class="string" x1="144" y1="218" x2="156" y2="278"/>
+                <line class="limb-ink"  x1="144" y1="218" x2="156" y2="278"/>
+                <line class="limb-skin" x1="144" y1="218" x2="156" y2="278"/>
+                <circle class="joint" cx="150" cy="248" r="6.5"/>
               </g>
-              <!-- Cejas -->
-              <g class="brows">
-                <path d="M76,76 Q84,72 92,76"/>
-                <path d="M108,76 Q116,72 124,76"/>
-              </g>
-              <!-- Ojos: 3 variantes -->
-              <g class="eyes eyes-open">
-                <circle cx="84" cy="90" r="6"/>
-                <circle cx="116" cy="90" r="6"/>
-              </g>
-              <g class="eyes eyes-happy">
-                <path d="M78,91 Q84,84 90,91"/>
-                <path d="M110,91 Q116,84 122,91"/>
-              </g>
-              <g class="eyes eyes-wink">
-                <circle cx="84" cy="90" r="6"/>
-                <path d="M110,91 Q116,84 122,91"/>
-              </g>
-              <!-- Bocas: 5 variantes -->
-              <path class="mouth m-smile"  d="M84,110 Q100,124 116,110"/>
-              <path class="mouth m-grin"   d="M82,108 Q100,116 118,108 Q100,136 82,108 Z"/>
-              <path class="mouth m-soft"   d="M90,113 Q100,120 110,113"/>
-              <path class="mouth m-squig"  d="M86,114 Q92,108 98,114 Q104,120 110,114"/>
-              <path class="mouth m-smirk"  d="M86,113 Q100,121 116,106"/>
-              <!-- Gotita de pena -->
-              <path class="sweat" d="M148,64 c5,8 5,12 0,16 c-5,-4 -5,-8 0,-16 Z"/>
-              <!-- Corazón que flota -->
-              <path class="fly-heart" d="M100,150 c-6,-8 -18,-2 -14,7 c3,7 14,13 14,13 c0,0 11,-6 14,-13 c4,-9 -8,-15 -14,-7 Z"/>
+
+              <path class="fly-heart" d="M110,235 c-6,-8 -18,-2 -14,7 c3,7 14,13 14,13 c0,0 11,-6 14,-13 c4,-9 -8,-15 -14,-7 Z"/>
             </svg>
           </div>
         </div>
 
-        <!-- Micrófono -->
+        <!-- Micrófono al centro -->
         <div class="mic">
           <svg viewBox="0 0 80 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <ellipse cx="40" cy="236" rx="26" ry="7" fill="#2a2a30"/>
@@ -492,10 +576,123 @@ body{
             <rect x="30" y="22" width="7" height="30" rx="3.5" fill="rgba(255,255,255,.16)"/>
           </svg>
         </div>
+
+        <!-- TÍTERE B: Adriana, pelo largo con moño y vestido -->
+        <div class="puppet-rig puppet-b character" id="puppetB">
+          <div class="shadow"></div>
+          <div class="rig-sway">
+            <svg class="puppet-svg" viewBox="0 0 220 430" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <rect class="crossbar" x="34" y="8" width="152" height="12" rx="6"/>
+              <rect class="crossbar" x="104" y="2" width="12" height="24" rx="5"/>
+              <circle class="crossbar-knob" cx="46" cy="14" r="7"/>
+              <circle class="crossbar-knob" cx="174" cy="14" r="7"/>
+              <line class="string" x1="110" y1="20" x2="110" y2="96"/>
+              <line class="string" x1="52"  y1="20" x2="78"  y2="214"/>
+              <line class="string" x1="168" y1="20" x2="142" y2="214"/>
+
+              <g class="leg leg-left">
+                <line class="limb-ink"  x1="96" y1="306" x2="94" y2="376"/>
+                <line class="limb-skin" x1="96" y1="306" x2="94" y2="376"/>
+                <circle class="joint" cx="95" cy="342" r="7"/>
+                <rect class="shoe" x="80" y="372" width="30" height="14" rx="7"/>
+              </g>
+              <g class="leg leg-right">
+                <line class="limb-ink"  x1="124" y1="306" x2="126" y2="376"/>
+                <line class="limb-skin" x1="124" y1="306" x2="126" y2="376"/>
+                <circle class="joint" cx="125" cy="342" r="7"/>
+                <rect class="shoe" x="110" y="372" width="30" height="14" rx="7"/>
+              </g>
+
+              <path class="neck" d="M99,192 h22 v18 h-22 Z"/>
+              <!-- Vestido acampanado -->
+              <path class="outfit" d="M74,214 Q110,204 146,214 L158,308 Q110,320 62,308 Z"/>
+              <path class="seam" d="M110,214 L110,308"/>
+
+              <g class="head-tilt">
+                <!-- Melena detrás de la cabeza -->
+                <path class="hair" d="M70,140 Q58,190 66,222 Q78,232 88,224 L88,170 Z"/>
+                <path class="hair" d="M150,140 Q162,190 154,222 Q142,232 132,224 L132,170 Z"/>
+                <circle class="head" cx="110" cy="152" r="44"/>
+                <path class="hair" d="M66,152 A44,44 0 0 1 154,152
+                  C154,142 148,138 139,142 C135,134 123,136 118,142
+                  C114,134 106,134 102,142 C97,136 85,134 81,142
+                  C72,138 66,142 66,152 Z"/>
+                <!-- Moño -->
+                <circle class="hair" cx="110" cy="102" r="15"/>
+                <circle class="crossbar-knob" cx="110" cy="90" r="4.5"/>
+                <g class="brows">
+                  <path d="M87,140 Q95,136 103,140"/>
+                  <path d="M117,140 Q125,136 133,140"/>
+                </g>
+                <circle class="blush" cx="80" cy="166" r="7"/>
+                <circle class="blush" cx="140" cy="166" r="7"/>
+                <g class="eyes eyes-open">
+                  <circle cx="95" cy="154" r="6"/>
+                  <circle cx="125" cy="154" r="6"/>
+                  <path d="M87,147 L91,144"/>
+                  <path d="M133,147 L129,144"/>
+                </g>
+                <g class="eyes eyes-happy">
+                  <path d="M89,155 Q95,148 101,155"/>
+                  <path d="M119,155 Q125,148 131,155"/>
+                </g>
+                <g class="eyes eyes-wink">
+                  <circle cx="95" cy="154" r="6"/>
+                  <path d="M119,155 Q125,148 131,155"/>
+                </g>
+                <path class="mouth m-smile"  d="M95,174 Q110,188 125,174"/>
+                <path class="mouth m-grin"   d="M93,172 Q110,180 127,172 Q110,200 93,172 Z"/>
+                <path class="mouth m-soft"   d="M100,177 Q110,184 120,177"/>
+                <path class="mouth m-squig"  d="M96,178 Q102,172 108,178 Q114,184 120,178"/>
+                <path class="mouth m-smirk"  d="M96,177 Q110,185 126,170"/>
+                <path class="sweat" d="M157,126 c5,8 5,12 0,16 c-5,-4 -5,-8 0,-16 Z"/>
+              </g>
+
+              <g class="arm arm-left">
+                <line class="string" x1="76" y1="218" x2="64" y2="278"/>
+                <line class="limb-ink"  x1="76" y1="218" x2="64" y2="278"/>
+                <line class="limb-skin" x1="76" y1="218" x2="64" y2="278"/>
+                <circle class="joint" cx="70" cy="248" r="6.5"/>
+              </g>
+              <g class="arm arm-right">
+                <line class="string" x1="144" y1="218" x2="156" y2="278"/>
+                <line class="limb-ink"  x1="144" y1="218" x2="156" y2="278"/>
+                <line class="limb-skin" x1="144" y1="218" x2="156" y2="278"/>
+                <circle class="joint" cx="150" cy="248" r="6.5"/>
+              </g>
+
+              <path class="fly-heart" d="M110,235 c-6,-8 -18,-2 -14,7 c3,7 14,13 14,13 c0,0 11,-6 14,-13 c4,-9 -8,-15 -14,-7 Z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Utilería -->
+        <div class="prop" id="propCake">
+          <svg viewBox="0 0 120 112" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="60" cy="104" rx="54" ry="7" fill="#d9c9a8"/>
+            <rect x="14" y="66" width="92" height="38" rx="8" fill="#f3c98b" stroke="#43302b" stroke-width="4"/>
+            <rect x="20" y="48" width="80" height="24" rx="7" fill="#ffe3b0" stroke="#43302b" stroke-width="4"/>
+            <rect x="27" y="32" width="66" height="22" rx="7" fill="#fff3d9" stroke="#43302b" stroke-width="4"/>
+            <path d="M27,44 q8,8 16,0 q8,8 16,0 q8,8 16,0 q8,8 18,0" fill="none" stroke="#fffaf0" stroke-width="5" stroke-linecap="round"/>
+            <line x1="60" y1="32" x2="60" y2="16" stroke="#e07a5f" stroke-width="5" stroke-linecap="round"/>
+            <path d="M60,14 q5,-7 0,-11 q-5,4 0,11 Z" fill="#ffcf6a" stroke="#e6952e" stroke-width="2"/>
+            <text x="60" y="98" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-weight="bold" font-size="20" fill="#7a4a1e">30</text>
+          </svg>
+        </div>
+        <div class="prop" id="propGift">
+          <svg viewBox="0 0 110 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="15" y="44" width="80" height="56" rx="8" fill="#c05b56" stroke="#43302b" stroke-width="4"/>
+            <rect x="10" y="30" width="90" height="20" rx="6" fill="#d96b5e" stroke="#43302b" stroke-width="4"/>
+            <rect x="47" y="30" width="16" height="70" fill="#ffd98a" stroke="#43302b" stroke-width="3"/>
+            <path d="M55,30 C40,26 36,10 48,8 C56,7 57,20 55,28 C53,20 54,7 62,8 C74,10 70,26 55,30 Z"
+                  fill="#ffd98a" stroke="#43302b" stroke-width="3.5" stroke-linejoin="round"/>
+          </svg>
+        </div>
+
       </div>
     </div>
 
-    <!-- Texto de la historia -->
+    <!-- Texto -->
     <div class="caption-band">
       <p class="caption" id="caption"></p>
       <p class="signature" id="signature">— Para ti, Adriana ✦</p>
@@ -508,9 +705,12 @@ body{
     </div>
   </div>
 
-  <!-- Cortinas y cenefa (encima de todo, se abren al empezar) -->
+  <!-- Marco del teatrino -->
+  <div class="frame-side frame-l"></div>
+  <div class="frame-side frame-r"></div>
   <div class="curtain curtain-l"></div>
   <div class="curtain curtain-r"></div>
+  <div class="marquee">✦ EL TEATRINO ✦</div>
   <div class="valance">
     <svg viewBox="0 0 120 20" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -534,8 +734,8 @@ body{
     <span class="spark" style="top:26%; left:80%; animation-delay:.9s">✧</span>
     <span class="spark" style="top:70%; left:22%; animation-delay:1.6s">✧</span>
     <span class="spark" style="top:66%; left:78%; animation-delay:2.3s">✦</span>
-    <div class="eyebrow">Una función especial</div>
-    <h1>Un pequeño teatro<br>para</h1>
+    <div class="eyebrow">Función de títeres · dos personajes</div>
+    <h1>Un teatrino<br>para</h1>
     <div class="who">Adriana</div>
     <p class="hint">✦ toca para abrir el telón ✦</p>
     <button class="begin-btn" id="beginBtn" type="button">Comenzar</button>
@@ -563,7 +763,10 @@ body{
   var theater   = $('#theater');
   var scene     = $('#scene');
   var backdrop  = $('#backdrop');
-  var character = $('#character');
+  var puppetA   = $('#puppetA');
+  var puppetB   = $('#puppetB');
+  var propCake  = $('#propCake');
+  var propGift  = $('#propGift');
   var caption   = $('#caption');
   var signature = $('#signature');
   var dotsWrap  = $('#dots');
@@ -575,17 +778,24 @@ body{
   var ctx       = canvas.getContext('2d');
   var reduce    = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // ---- Historia ----
+  // ---- La obra: t = texto, a = ánimo títere A (tú), b = ánimo títere B (ella),
+  //      enterB = ella baja al escenario en este paso, prop = utilería visible ----
   var steps = [
-    { text:"Te conocí de la nada, llegando al trabajo nuevo…",                 mood:"curious"  },
-    { text:"…y nuestra primera charla fue que querías un aumento de sueldo.",  mood:"playful"  },
-    { text:"De ahí, verte cumplir tus 30 años…",                              mood:"celebrate"},
-    { text:"…y te pido perdón por darte un pastel de tres leches.",           mood:"sheepish" },
-    { text:"Luego darnos esos regalos, empezar a conocerte…",                 mood:"warm"     },
-    { text:"…y ya para este año te volviste mi apoyo incondicional.",         mood:"grateful" },
-    { text:"Hoy quiero que sepas que esto no es un mensaje de «vuelve»…",     mood:"sincere"  },
-    { text:"…es un regalo, de corazón, para ti.",                            mood:"heart"    },
-    { text:"Ve, sé feliz y cómete el mundo.",                                mood:"joy", final:true }
+    { t:"Ésta es la historia de dos personas a las que un trabajo nuevo juntó.", a:"warm" },
+    { t:"Te conocí de la nada, llegando al trabajo nuevo…",                      a:"curious", enterB:true, b:"warm" },
+    { t:"…y nuestra primera charla fue que querías un aumento de sueldo.",       a:"playful", b:"playful" },
+    { t:"Directa desde el día uno. Y eso, la verdad, me encantó.",              a:"warm", b:"laugh" },
+    { t:"De ahí, verte cumplir tus 30 años…",                                   a:"celebrate", b:"celebrate", prop:"cake" },
+    { t:"…y te pido perdón por darte un pastel de tres leches.",                a:"sheepish", b:"laugh", prop:"cake" },
+    { t:"(Prometo que la intención era buena…)",                                a:"sheepish", b:"laugh", prop:"cake" },
+    { t:"Luego darnos esos regalos, empezar a conocerte…",                      a:"warm", b:"warm", prop:"gift" },
+    { t:"…las charlas, las risas, los días buenos y los no tan buenos.",        a:"warm", b:"grateful" },
+    { t:"…y ya para este año te volviste mi apoyo incondicional.",              a:"grateful", b:"grateful" },
+    { t:"Gracias por escucharme, por aguantarme, por estar ahí.",               a:"sincere", b:"warm" },
+    { t:"Hoy quiero que sepas que esto no es un mensaje de «vuelve»…",          a:"sincere", b:"sincere" },
+    { t:"…es un abrazo. Un gracias del tamaño del mundo.",                      a:"warm", b:"heart" },
+    { t:"…es un regalo, de corazón, para ti.",                                 a:"heart", b:"heart" },
+    { t:"Ve, sé feliz y cómete el mundo.",                                     a:"joy", b:"joy", final:true }
   ];
 
   // ---- Puntitos de progreso ----
@@ -597,7 +807,7 @@ body{
     dots.push(d);
   });
 
-  // ---- Luciérnagas ambientales (CSS, baratas) ----
+  // ---- Luciérnagas ----
   var moteCount = reduce ? 0 : 12;
   for(var i=0;i<moteCount;i++){
     var m = document.createElement('span');
@@ -613,7 +823,7 @@ body{
     backdrop.appendChild(m);
   }
 
-  var idx = -1, busy = false, started = false;
+  var idx = -1, busy = false, started = false, bOnStage = false;
   var wait = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
 
   function voice(){ return document.getElementById('voz'); }
@@ -622,12 +832,34 @@ body{
 
   function updateDots(){ for(var i=0;i<dots.length;i++){ dots[i].classList.toggle('on', i<=idx); } }
 
+  function setProps(name){
+    propCake.classList.toggle('show', name === 'cake');
+    propGift.classList.toggle('show', name === 'gift');
+  }
+
+  function dropPuppet(rig){
+    rig.classList.add('landing');
+    requestAnimationFrame(function(){ rig.classList.add('entered'); });
+    setTimeout(function(){ rig.classList.remove('landing'); }, reduce ? 80 : 2400);
+  }
+
+  function resetPuppet(rig){
+    rig.classList.add('no-anim');
+    rig.classList.remove('entered','landing');
+    rig.removeAttribute('data-mood');
+    void rig.offsetWidth;
+    rig.classList.remove('no-anim');
+  }
+
   function applyStep(i){
     idx = i;
     var s = steps[i];
-    caption.textContent = s.text;
+    caption.textContent = s.t;
     caption.classList.toggle('final', !!s.final);
-    character.dataset.mood = s.mood;
+    puppetA.dataset.mood = s.a;
+    if(s.enterB && !bOnStage){ bOnStage = true; dropPuppet(puppetB); }
+    if(s.b && bOnStage){ puppetB.dataset.mood = s.b; }
+    setProps(s.prop || null);
     updateDots();
     if(s.final){
       nextBtn.textContent = 'Repetir función ↺';
@@ -642,10 +874,12 @@ body{
     caption.classList.remove('show');
     signature.classList.remove('show');
     await wait(reduce ? 40 : 330);
+    var entering = !!steps[i].enterB && !bOnStage;
     applyStep(i);
-    void caption.offsetWidth;              // reinicia la transición
+    void caption.offsetWidth;
     caption.classList.add('show');
-    await wait(reduce ? 40 : 360);
+    // Si ella está bajando, esperamos a que aterrice antes de habilitar el botón
+    await wait(reduce ? 40 : (entering ? 2450 : 360));
     busy = false;
   }
 
@@ -655,14 +889,11 @@ body{
     playVoice();
     startScr.classList.add('hidden');
     await wait(reduce ? 20 : 220);
-    theater.classList.add('open');                 // se abren las cortinas
+    theater.classList.add('open');
     await wait(reduce ? 20 : 850);
-    character.dataset.mood = 'curious';            // cara amable al entrar
-    if(!reduce) character.classList.add('walking');
-    requestAnimationFrame(function(){ character.classList.add('entered'); }); // camina al micro
-    await wait(reduce ? 60 : 2250);
-    character.classList.remove('walking');
-    await wait(reduce ? 20 : 150);
+    puppetA.dataset.mood = 'warm';
+    dropPuppet(puppetA);
+    await wait(reduce ? 60 : 2450);
     controls.classList.add('ready');
     busy = false;
     goTo(0);
@@ -674,15 +905,13 @@ body{
     scene.classList.remove('finale');
     caption.classList.remove('show');
     signature.classList.remove('show');
+    setProps(null);
     await wait(300);
-    theater.classList.remove('open');             // se cierran las cortinas
+    theater.classList.remove('open');
     await wait(reduce ? 60 : 950);
-    // Regresa al personaje fuera de escena sin animación (oculto tras las cortinas)
-    character.classList.add('no-anim');
-    character.classList.remove('entered');
-    character.removeAttribute('data-mood');
-    void character.offsetWidth;
-    character.classList.remove('no-anim');
+    resetPuppet(puppetA);
+    resetPuppet(puppetB);
+    bOnStage = false;
     idx = -1; updateDots();
     nextBtn.textContent = 'Siguiente ›';
     controls.classList.remove('ready');
@@ -720,7 +949,7 @@ body{
   function spawn(){
     var colors = ['#ffd98a','#ffb877','#ff9d7a','#ffe6b0','#ffcf6a'];
     parts.push({
-      x: canvas.width * (0.2 + Math.random()*0.6),
+      x: canvas.width * (0.15 + Math.random()*0.7),
       y: canvas.height * (0.9 + Math.random()*0.12),
       vx: (Math.random()-0.5) * 0.5 * dpr,
       vy: -(0.6 + Math.random()*1.1) * dpr,
@@ -759,7 +988,7 @@ body{
     if(reduce) return;
     sizeCanvas();
     emitting = true;
-    emitUntil = performance.now() + 1600;
+    emitUntil = performance.now() + 1900;
     if(!raf) raf = requestAnimationFrame(tick);
   }
   function stopFx(){
